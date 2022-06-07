@@ -62,11 +62,10 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         if let Some(lock) =
             Redlock::try_lock(&servers, &args.lock_name, Duration::from_secs(args.ttl))
         {
-            let ctrlc_lock = lock.clone();
             let lock_name = args.lock_name.clone();
             ctrlc::set_handler(move || {
                 // move in the copy of the lock
-                let _lock = &ctrlc_lock;
+                let _lock = &lock;
                 // unlock on drop
                 debug!("unlocked {}", lock_name);
             })?;
